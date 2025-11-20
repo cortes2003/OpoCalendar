@@ -1,0 +1,10 @@
+fastapi
+uvicorn[standard]
+sqlalchemy
+mysql-connector-python
+pandas
+scikit-learn
+pydantic
+python-multipart
+python-jose[cryptography]
+passlib[bcrypt]
