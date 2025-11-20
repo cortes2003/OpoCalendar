@@ -1,18 +1,19 @@
 export type TaskType = 'study' | 'class' | 'personal' | 'break';
 export type Priority = 'high' | 'medium' | 'low';
 
+// Esta interfaz coincide EXACTAMENTE con tu base de datos MySQL
 export interface Task {
-  id: string;
+  id: number;          // ID numérico (antes era string)
   title: string;
   description?: string;
-  type: TaskType;      
+  type: TaskType;
   priority: Priority;
-  date: string;        // Formato "YYYY-MM-DD"
-  startTime: string;   // Formato "HH:mm"
-  endTime: string;     // Formato "HH:mm"
-  duration: number;    // Minutos (Sagrado para la IA)
-  isFixed: boolean;    
-  emailReminder: boolean;
-  repeatWeekly: boolean;
-  completed: boolean;  // Nuevo campo para el check
+  date: string;        // "YYYY-MM-DD"
+  start_time: string;  // Python usa guiones bajos (snake_case)
+  end_time: string;    
+  duration: number;
+  is_fixed: boolean;   
+  email_reminder: boolean;
+  repeat_weekly: boolean;
+  completed: boolean;
 }
