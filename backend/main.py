@@ -4,7 +4,8 @@ from sqlalchemy.orm import Session
 from typing import List
 
 import models, schemas, crud, ai_service
-from database import date, engine, get_db
+from database import engine, get_db
+from datetime import date
 
 # Crear tablas al inicio
 models.Base.metadata.create_all(bind=engine)
