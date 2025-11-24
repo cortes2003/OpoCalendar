@@ -1,6 +1,6 @@
 # 📅 OpoCalendar - Planificador Inteligente para Opositores
 
-**OpoCalendar'** es una aplicación Full Stack diseñada para optimizar el tiempo de estudio. Utiliza un algoritmo inteligente (IA) para reorganizar automáticamente la agenda diaria, respetando descansos, prioridades y horas fijas, ayudando a opositores y estudiantes a maximizar su productividad sin estrés.
+**OpoCalendar** es una aplicación Full Stack diseñada para optimizar el tiempo de estudio. Utiliza un algoritmo inteligente (IA) para reorganizar automáticamente la agenda diaria, respetando descansos, prioridades y horas fijas, ayudando a opositores y estudiantes a maximizar su productividad sin estrés.
 
 ![Estado del Proyecto](https://img.shields.io/badge/Estado-En%20Desarrollo-blue)
 ![Licencia](https://img.shields.io/badge/Licencia-MIT-green)
