@@ -54,10 +54,10 @@ El proyecto sigue una arquitectura de **Monorepo** dividida en dos servicios:
 
 ------------------------------------------------------------------------
 
-# 🏁 Guía de Instalación y Ejecución
+## 🏁 Guía de Instalación y Ejecución
 Para ejecutar el sistema completo en local, necesitas tener instalados: Python, Node.js y MySQL.
 
-## Paso 1: Configuración de Base de Datos
+### Paso 1: Configuración de Base de Datos
 1. Abre tu gestor de MySQL (Workbench o Terminal).
 2. Crea una base de datos vacía llamada opoflow_db.
 
@@ -65,7 +65,7 @@ Para ejecutar el sistema completo en local, necesitas tener instalados: Python, 
 CREATE DATABASE opoflow_db;
 ```
 
-## Paso 2: Arrancar el Backend
+### Paso 2: Arrancar el Backend
 Abre una terminal en la raíz del proyecto:
 
 ``` bash
@@ -94,7 +94,7 @@ El servidor estará escuchando en: http://127.0.0.1:8000
 
 ------------------------------------------------------------------------
 
-## 3. Paso 3: Arrancar el Frontend
+### 3. Paso 3: Arrancar el Frontend
 Abre otra terminal nueva en la raíz del proyecto:
 
 ``` bash
@@ -111,7 +111,7 @@ La web estará disponible en: http://localhost:5173
 
 ------------------------------------------------------------------------
 
-# 🤖 Cómo Funciona la IA
+## 🤖 Cómo Funciona la IA
 
 El servicio de optimización (backend/ai_service.py) sigue esta lógica:
 
@@ -124,7 +124,7 @@ El servicio de optimización (backend/ai_service.py) sigue esta lógica:
 
 ------------------------------------------------------------------------
 
-# 📚 Documentación API
+## 📚 Documentación API
 
 Puedes ver y probar los endpoints del backend (Crear tarea, Optimizar, etc.) accediendo a la documentación automática generada por Swagger:
 
@@ -132,6 +132,6 @@ Puedes ver y probar los endpoints del backend (Crear tarea, Optimizar, etc.) acc
 
 ------------------------------------------------------------------------
 
-# 👤 Autor
+## 👤 Autor
 
 Desarrollado por **Alberto Cortés**.
