@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { Plus, Sparkles, Trash2, X, Calendar as CalendarIcon, Clock, Save, ChevronLeft, ChevronRight, ArrowLeft, Edit2, CheckCircle, Circle, AlertTriangle, BarChart3, Layout, Settings, Bell, User } from 'lucide-react';
 import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, eachDayOfInterval, isSameDay, isSameMonth, addMonths, subMonths, parseISO } from 'date-fns';
 import { es } from 'date-fns/locale';
-import { optimizeSchedule } from './aiScheduler';
 import { api } from './api';
 import type { Task, TaskType, Priority } from './types';
 
@@ -86,17 +85,24 @@ const OpoFlowApp = () => {
   };
 
   const handleOptimize = async () => {
+    // Comprobamos si hay tareas visualmente antes de llamar
     const dayTasks = tasks.filter(t => t.date === selectedDate);
-    if (dayTasks.length === 0) { showAlert("Sin tareas", "No hay actividades hoy.", "error"); return; }
-    
-    const optimizedDayTasks = optimizeSchedule(dayTasks, '08:00', '22:00');
-    
-    for (const task of optimizedDayTasks) {
-        await api.updateTask(task.id, { start_time: task.start_time, end_time: task.end_time });
+    if (dayTasks.length === 0) { 
+        showAlert("Sin tareas", "No hay actividades hoy para organizar.", "error"); 
+        return; 
     }
     
-    await loadTasks();
-    showAlert("¡Día Optimizado!", "Horario reorganizado.", "success");
+    try {
+        // Llamada al Backend Python
+        await api.optimizeDay(selectedDate);
+        
+        // Recargamos los datos para ver los cambios
+        await loadTasks();
+        
+        showAlert("¡Día Optimizado!", "La IA de Python ha reorganizado tu horario.", "success");
+    } catch (error) {
+        showAlert("Error", "No se pudo conectar con el servicio de IA.", "error");
+    }
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {

@@ -56,5 +56,14 @@ export const api = {
   // BORRAR
   deleteTask: async (id: number): Promise<void> => {
     await fetch(`${API_URL}/tasks/${id}`, { method: 'DELETE' });
+  },
+
+  // IA: Optimizar día
+  optimizeDay: async (date: string): Promise<void> => {
+    const res = await fetch(`${API_URL}/optimize/${date}`, {
+      method: 'POST',
+    });
+    if (!res.ok) throw new Error('Error al optimizar el horario');
   }
+
 };

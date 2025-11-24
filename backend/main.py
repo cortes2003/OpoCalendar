@@ -3,8 +3,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from typing import List
 
-import models, schemas, crud
-from database import engine, get_db
+import models, schemas, crud, ai_service
+from database import date, engine, get_db
 
 # Crear tablas al inicio
 models.Base.metadata.create_all(bind=engine)
@@ -42,8 +42,13 @@ def delete_task(task_id: int, db: Session = Depends(get_db)):
 
 # 4. Actualizar una tarea (Editar / Completar)
 @app.put("/tasks/{task_id}", response_model=schemas.Task)
-def update_task(task_id: int, task: schemas.TaskCreate, db: Session = Depends(get_db)):
+def update_task(task_id: int, task: schemas.TaskUpdate, db: Session = Depends(get_db)): # <--- OJO: TaskUpdate
     updated_task = crud.update_task(db, task_id, task)
     if updated_task is None:
         raise HTTPException(status_code=404, detail="Tarea no encontrada")
     return updated_task
+
+# 5. Optimizar el día
+@app.post("/optimize/{target_date}")
+def optimize_schedule(target_date: date, db: Session = Depends(get_db)):
+    return ai_service.optimize_day(db, target_date)

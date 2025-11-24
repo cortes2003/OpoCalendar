@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 from typing import Optional
-from datetime import date, time
+import datetime
 from models import TaskType, Priority
 
 # Esquema base (datos comunes)
@@ -9,22 +9,43 @@ class TaskBase(BaseModel):
     description: Optional[str] = None
     type: TaskType
     priority: Priority
-    date: date
-    start_time: time
-    end_time: time
+    
+    # Usamos datetime.date para diferenciarlo del campo 'date'
+    date: datetime.date 
+    start_time: datetime.time
+    end_time: datetime.time
+    
     duration: int
     is_fixed: bool = False
     email_reminder: bool = True
     repeat_weekly: bool = False
     completed: bool = False
 
-# Esquema para CREAR (lo que recibimos del frontend)
+# Esquema para CREAR
 class TaskCreate(TaskBase):
     pass
 
-# Esquema para LEER (lo que enviamos al frontend, incluye el ID)
+# Esquema para ACTUALIZAR (parcial)
+class TaskUpdate(BaseModel):
+    title: Optional[str] = None
+    description: Optional[str] = None
+    type: Optional[TaskType] = None
+    priority: Optional[Priority] = None
+    
+    # Aquí estaba el error, ahora usamos datetime.date
+    date: Optional[datetime.date] = None 
+    start_time: Optional[datetime.time] = None
+    end_time: Optional[datetime.time] = None
+    
+    duration: Optional[int] = None
+    is_fixed: Optional[bool] = None
+    email_reminder: Optional[bool] = None
+    repeat_weekly: Optional[bool] = None
+    completed: Optional[bool] = None
+
+# Esquema para LEER
 class Task(TaskBase):
     id: int
 
     class Config:
-        from_attributes = True # Esto permite leer desde SQLAlchemy
+        from_attributes = True
