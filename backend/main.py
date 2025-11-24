@@ -49,7 +49,12 @@ def update_task(task_id: int, task: schemas.TaskUpdate, db: Session = Depends(ge
         raise HTTPException(status_code=404, detail="Tarea no encontrada")
     return updated_task
 
-# 5. Optimizar el día
+# 5. Endpoint de IA
 @app.post("/optimize/{target_date}")
-def optimize_schedule(target_date: date, db: Session = Depends(get_db)):
-    return ai_service.optimize_day(db, target_date)
+def optimize_schedule(
+    target_date: date, 
+    day_start: str = "08:00", # Valores por defecto por seguridad
+    day_end: str = "22:00", 
+    db: Session = Depends(get_db)
+):
+    return ai_service.optimize_day(db, target_date, day_start, day_end)

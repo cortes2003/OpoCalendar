@@ -58,9 +58,12 @@ export const api = {
     await fetch(`${API_URL}/tasks/${id}`, { method: 'DELETE' });
   },
 
-  // IA: Optimizar día
-  optimizeDay: async (date: string): Promise<void> => {
-    const res = await fetch(`${API_URL}/optimize/${date}`, {
+  // IA: Optimizar día con parámetros de hora
+  optimizeDay: async (date: string, dayStart: string, dayEnd: string): Promise<void> => {
+    // Enviamos las horas como Query Params (?day_start=09:00&day_end=21:00)
+    const url = `${API_URL}/optimize/${date}?day_start=${dayStart}&day_end=${dayEnd}`;
+    
+    const res = await fetch(url, {
       method: 'POST',
     });
     if (!res.ok) throw new Error('Error al optimizar el horario');

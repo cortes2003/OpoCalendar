@@ -20,10 +20,13 @@ const OpoFlowApp = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
+  // Estado de usuario con configuración de horario
   const [userSettings, setUserSettings] = useStickyState({
     name: 'Opositor',
     email: '',
-    notificationsEnabled: false
+    notificationsEnabled: false,
+    dayStart: '08:00',
+    dayEnd: '22:00'
   }, 'opoflow-settings');
 
   const [view, setView] = useState<'calendar' | 'day' | 'settings'>('calendar');
@@ -42,6 +45,7 @@ const OpoFlowApp = () => {
     is_fixed: false, email_reminder: true, repeat_weekly: false
   });
 
+  // Carga inicial
   useEffect(() => {
     loadTasks();
   }, []);
@@ -53,6 +57,7 @@ const OpoFlowApp = () => {
     setIsLoading(false);
   };
 
+  // Worker de Notificaciones (Navegador)
   useEffect(() => {
     const interval = setInterval(() => {
       const now = new Date();
@@ -84,24 +89,19 @@ const OpoFlowApp = () => {
     return eachDayOfInterval({ start, end });
   };
 
+  // --- OPTIMIZACIÓN IA ---
   const handleOptimize = async () => {
-    // Comprobamos si hay tareas visualmente antes de llamar
     const dayTasks = tasks.filter(t => t.date === selectedDate);
-    if (dayTasks.length === 0) { 
-        showAlert("Sin tareas", "No hay actividades hoy para organizar.", "error"); 
-        return; 
-    }
+    if (dayTasks.length === 0) { showAlert("Sin tareas", "No hay actividades hoy.", "error"); return; }
     
     try {
-        // Llamada al Backend Python
-        await api.optimizeDay(selectedDate);
+        // Enviamos las horas configuradas en el Sidebar al Backend
+        await api.optimizeDay(selectedDate, userSettings.dayStart, userSettings.dayEnd);
         
-        // Recargamos los datos para ver los cambios
         await loadTasks();
-        
-        showAlert("¡Día Optimizado!", "La IA de Python ha reorganizado tu horario.", "success");
+        showAlert("¡Día Optimizado!", "Horario reorganizado según tu disponibilidad.", "success");
     } catch (error) {
-        showAlert("Error", "No se pudo conectar con el servicio de IA.", "error");
+        showAlert("Error", "No se pudo conectar con la IA.", "error");
     }
   };
 
@@ -205,6 +205,7 @@ const OpoFlowApp = () => {
             <button onClick={() => setView('settings')} className="hidden md:flex p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-full transition-colors"><Settings size={20} /></button>
         </div>
         <div className="flex-1 overflow-y-auto custom-scrollbar p-6">
+            {/* CALENDARIO */}
             <div className="flex justify-between items-center mb-6">
                 <button onClick={() => setCurrentMonth(subMonths(currentMonth, 1))} className="p-2 hover:bg-gray-100 rounded-full transition-colors"><ChevronLeft size={20}/></button>
                 <h2 className="text-lg font-bold capitalize text-gray-800">{format(currentMonth, 'MMMM yyyy', { locale: es })}</h2>
@@ -226,6 +227,43 @@ const OpoFlowApp = () => {
                         </button>
                     );
                 })}
+            </div>
+
+            {/* LEYENDA */}
+            <div className="mt-8 p-4 bg-gray-50 rounded-xl border border-gray-100">
+                <h3 className="text-xs font-bold text-gray-400 uppercase mb-3">Categorías</h3>
+                <div className="space-y-2 text-sm text-gray-600">
+                    <div className="flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-blue-500"></div>Estudio</div>
+                    <div className="flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-red-500"></div>Clase / Examen</div>
+                    <div className="flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-green-500"></div>Personal</div>
+                </div>
+            </div>
+
+            {/* CONFIGURACIÓN DE HORARIO IA */}
+            <div className="mt-4 p-4 bg-white rounded-xl border border-gray-200 shadow-sm">
+                <h3 className="text-xs font-bold text-gray-400 uppercase mb-3 flex items-center gap-2">
+                    <Clock size={14}/> Horario Disponible
+                </h3>
+                <div className="grid grid-cols-2 gap-2">
+                    <div>
+                        <label className="block text-[10px] font-bold text-gray-500 mb-1">Inicio</label>
+                        <input 
+                            type="time" 
+                            value={userSettings.dayStart} 
+                            onChange={e => setUserSettings({...userSettings, dayStart: e.target.value})}
+                            className="w-full px-2 py-1.5 bg-gray-50 border border-gray-200 rounded-lg text-xs focus:ring-1 focus:ring-blue-500 outline-none font-medium text-gray-700"
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-[10px] font-bold text-gray-500 mb-1">Fin</label>
+                        <input 
+                            type="time" 
+                            value={userSettings.dayEnd} 
+                            onChange={e => setUserSettings({...userSettings, dayEnd: e.target.value})}
+                            className="w-full px-2 py-1.5 bg-gray-50 border border-gray-200 rounded-lg text-xs focus:ring-1 focus:ring-blue-500 outline-none font-medium text-gray-700"
+                        />
+                    </div>
+                </div>
             </div>
         </div>
       </aside>
@@ -297,10 +335,8 @@ const OpoFlowApp = () => {
         )}
       </main>
 
-      {/* MODALES (Correctamente situados fuera de main, pero dentro del div root) */}
       {confirmConfig.isOpen && <div className="fixed inset-0 bg-black/60 z-[60] flex items-center justify-center p-4"><div className="bg-white rounded-3xl p-8 text-center w-full max-w-sm"><Trash2 size={32} className="mx-auto mb-4 text-red-500"/><h3 className="text-xl font-bold mb-2">{confirmConfig.title}</h3><p className="mb-8 text-gray-500">{confirmConfig.message}</p><div className="flex gap-3"><button onClick={closeModals} className="flex-1 py-3 font-semibold hover:bg-gray-50 rounded-xl">Cancelar</button><button onClick={confirmConfig.onConfirm} className="flex-1 py-3 font-bold text-white bg-red-500 hover:bg-red-600 rounded-xl">Eliminar</button></div></div></div>}
       {alertConfig.isOpen && <div className="fixed inset-0 bg-black/60 z-[60] flex items-center justify-center p-4"><div className="bg-white rounded-3xl p-8 text-center w-full max-w-sm"><Sparkles size={32} className="mx-auto mb-4 text-blue-500"/><h3 className="text-xl font-bold mb-2">{alertConfig.title}</h3><p className="mb-8 text-gray-500">{alertConfig.message}</p><button onClick={closeModals} className="w-full py-3 font-bold text-white bg-gray-900 hover:bg-black rounded-xl">Entendido</button></div></div>}
-      
       {showForm && (
         <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm animate-in fade-in">
           <div className="bg-white w-full max-w-lg rounded-3xl shadow-2xl max-h-[90vh] overflow-y-auto animate-in zoom-in-95 flex flex-col">
