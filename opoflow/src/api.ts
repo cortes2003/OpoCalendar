@@ -1,4 +1,4 @@
-import type { Task } from './types'; // <--- Añadido "type" aquí
+import type { Task } from './types';
 
 const API_URL = 'http://localhost:8000';
 
@@ -58,15 +58,16 @@ export const api = {
     await fetch(`${API_URL}/tasks/${id}`, { method: 'DELETE' });
   },
 
-  // IA: Optimizar día con parámetros de hora
+  // --- IA: OPTIMIZAR DÍA (CORREGIDO) ---
+  // Es vital que esta función reciba y envíe dayStart y dayEnd
   optimizeDay: async (date: string, dayStart: string, dayEnd: string): Promise<void> => {
-    // Enviamos las horas como Query Params (?day_start=09:00&day_end=21:00)
+    // Construimos la URL con los parámetros
     const url = `${API_URL}/optimize/${date}?day_start=${dayStart}&day_end=${dayEnd}`;
+    console.log("Llamando a IA con:", url); // Para depurar en consola del navegador
     
     const res = await fetch(url, {
       method: 'POST',
     });
     if (!res.ok) throw new Error('Error al optimizar el horario');
   }
-
 };
