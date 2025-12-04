@@ -2,12 +2,11 @@ import type { Task } from './types';
 
 const API_URL = 'http://localhost:8000';
 
-// Helpers para formatear horas
 const formatTimeForInput = (timeStr: string) => timeStr.slice(0, 5);
 const formatTimeForDb = (timeStr: string) => timeStr.length === 5 ? `${timeStr}:00` : timeStr;
 
 export const api = {
-  // LEER
+  // 1. OBTENER TODAS
   getTasks: async (): Promise<Task[]> => {
     try {
         const res = await fetch(`${API_URL}/tasks`);
@@ -24,8 +23,8 @@ export const api = {
     }
   },
 
-  // CREAR
-  createTask: async (task: Omit<Task, 'id'>): Promise<Task> => {
+  // 2. CREAR TAREA
+  createTask: async (task: any): Promise<Task> => {
     const payload = {
         ...task,
         start_time: formatTimeForDb(task.start_time),
@@ -36,11 +35,12 @@ export const api = {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
     });
+    if (!res.ok) throw new Error('Error al crear');
     return await res.json();
   },
 
-  // ACTUALIZAR
-  updateTask: async (id: number, task: Partial<Task>): Promise<Task> => {
+  // 3. ACTUALIZAR TAREA
+  updateTask: async (id: number, task: any): Promise<Task> => {
     const payload = { ...task };
     if (payload.start_time) payload.start_time = formatTimeForDb(payload.start_time);
     if (payload.end_time) payload.end_time = formatTimeForDb(payload.end_time);
@@ -50,24 +50,42 @@ export const api = {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
     });
+    if (!res.ok) throw new Error('Error al actualizar');
     return await res.json();
   },
 
-  // BORRAR
+  // 4. BORRAR TAREA
   deleteTask: async (id: number): Promise<void> => {
-    await fetch(`${API_URL}/tasks/${id}`, { method: 'DELETE' });
+    const res = await fetch(`${API_URL}/tasks/${id}`, { method: 'DELETE' });
+    if (!res.ok) throw new Error('Error al borrar');
   },
 
-  // --- IA: OPTIMIZAR DÍA (CORREGIDO) ---
-  // Es vital que esta función reciba y envíe dayStart y dayEnd
-  optimizeDay: async (date: string, dayStart: string, dayEnd: string): Promise<void> => {
-    // Construimos la URL con los parámetros
-    const url = `${API_URL}/optimize/${date}?day_start=${dayStart}&day_end=${dayEnd}`;
-    console.log("Llamando a IA con:", url); // Para depurar en consola del navegador
+  // --- IA NUEVA ---
+  
+  // 5. CALCULAR OPTIMIZACIÓN (Simulación)
+  calculateOptimization: async (date: string, dayStart: string, dayEnd: string, breaks: {start: string, end: string}[]) => {
+    const payload = {
+        day_start: dayStart,
+        day_end: dayEnd,
+        breaks: breaks.map(b => ({ start_time: b.start, end_time: b.end }))
+    };
     
-    const res = await fetch(url, {
+    const res = await fetch(`${API_URL}/optimize/calculate/${date}`, {
       method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
     });
-    if (!res.ok) throw new Error('Error al optimizar el horario');
+    if (!res.ok) throw new Error('Error IA');
+    return await res.json();
+  },
+
+  // 6. APLICAR OPTIMIZACIÓN (Guardar cambios)
+  applyOptimization: async (proposals: any[]) => {
+    const res = await fetch(`${API_URL}/optimize/apply`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(proposals)
+    });
+    if (!res.ok) throw new Error('Error al aplicar');
   }
 };

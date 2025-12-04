@@ -6,6 +6,7 @@ from typing import List
 import models, schemas, crud, ai_service
 from database import engine, get_db
 from datetime import date
+from typing import List
 
 # Crear tablas al inicio
 models.Base.metadata.create_all(bind=engine)
@@ -58,3 +59,25 @@ def optimize_schedule(
     db: Session = Depends(get_db)
 ):
     return ai_service.optimize_day(db, target_date, day_start, day_end)
+
+# 1. Endpoint para CALCULAR (Simulación)
+@app.post("/optimize/calculate/{target_date}", response_model=List[schemas.TaskProposal])
+def calculate_optimization(
+    target_date: date, 
+    request: schemas.OptimizationRequest,
+    db: Session = Depends(get_db)
+):
+    return ai_service.calculate_schedule(db, target_date, request)
+
+# 2. Endpoint para APLICAR (Guardar cambios)
+@app.post("/optimize/apply")
+def apply_optimization(proposals: List[schemas.TaskProposal], db: Session = Depends(get_db)):
+    count = 0
+    for p in proposals:
+        db_task = crud.get_task(db, p.task_id)
+        if db_task:
+            db_task.start_time = p.new_start
+            db_task.end_time = p.new_end
+            count += 1
+    db.commit()
+    return {"message": f"{count} tareas actualizadas correctamente"}

@@ -49,3 +49,23 @@ class Task(TaskBase):
 
     class Config:
         from_attributes = True
+
+
+# Esquema para un Descanso (Input del usuario)
+class BreakInterval(BaseModel):
+    start_time: str # "HH:MM"
+    end_time: str   # "HH:MM"
+
+# Esquema para la Petición de Optimización
+class OptimizationRequest(BaseModel):
+    day_start: str
+    day_end: str
+    breaks: list[BreakInterval] = []
+
+# Esquema para la Propuesta de Cambio (Respuesta de la IA)
+class TaskProposal(BaseModel):
+    task_id: int
+    title: str
+    old_start: Optional[datetime.time]
+    new_start: datetime.time
+    new_end: datetime.time
