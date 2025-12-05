@@ -10,8 +10,8 @@ def get_task(db: Session, task_id: int):
 
 # --- CREAR ---
 def create_task(db: Session, task: schemas.TaskCreate):
-    # Convertimos el esquema de Pydantic al modelo de SQLAlchemy
-    db_task = models.Task(**task.dict())
+    # Usar model_dump() en lugar de dict()
+    db_task = models.Task(**task.model_dump()) 
     db.add(db_task)
     db.commit()
     db.refresh(db_task)

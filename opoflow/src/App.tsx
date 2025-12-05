@@ -34,7 +34,7 @@ const OpoCalendarApp = () => {
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
 
-  // Modals & UI States
+  // Modals
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [alertConfig, setAlertConfig] = useState<{ isOpen: boolean; title: string; message: string; type: 'success' | 'error' | 'info'; }>({ isOpen: false, title: '', message: '', type: 'info' });
@@ -84,7 +84,7 @@ const OpoCalendarApp = () => {
     return () => clearInterval(interval);
   }, [tasks, userSettings]);
 
-  // IA Handlers
+  // Handlers
   const handleOpenAI = () => { setAiStep('questions'); setAiBreaks([]); setAiProposals([]); setShowAIModal(true); };
   const addBreak = () => setAiBreaks([...aiBreaks, { start: '14:00', end: '15:00' }]);
   const removeBreak = (index: number) => { const n = [...aiBreaks]; n.splice(index, 1); setAiBreaks(n); };
@@ -107,7 +107,6 @@ const OpoCalendarApp = () => {
     setIsProcessingAI(false);
   };
 
-  // UI Handlers
   const showAlert = (title: string, message: string, type: 'success' | 'error' | 'info' = 'success') => setAlertConfig({ isOpen: true, title, message, type });
   const showConfirm = (title: string, message: string, onConfirm: () => void) => setConfirmConfig({ isOpen: true, title, message, onConfirm });
   const closeModals = () => { setAlertConfig(p => ({ ...p, isOpen: false })); setConfirmConfig(p => ({ ...p, isOpen: false })); };
@@ -142,8 +141,14 @@ const OpoCalendarApp = () => {
     const end = new Date(`1970-01-01T${formData.end_time}:00`);
     const durationMin = (end.getTime() - start.getTime()) / 60000;
     if (durationMin <= 0) { showAlert("Error horario", "Hora fin debe ser posterior.", "error"); return; }
+    
+    // Validación Fecha Pasada
+    const now = new Date();
+    const taskDateTime = new Date(`${formData.date}T${formData.start_time}:00`);
+    if (taskDateTime < now) { showAlert("Fecha no válida", "No puedes programar en el pasado.", "error"); return; }
+
     const taskPayload: any = { ...formData, duration: durationMin, completed: false };
-    try { if (editingId) await api.updateTask(editingId, taskPayload); else await api.createTask(taskPayload); await loadTasks(); setShowForm(false); } catch (error) { showAlert("Error", "Fallo al guardar.", "error"); }
+    try { if (editingId) await api.updateTask(editingId, taskPayload); else await api.createTask(taskPayload); await loadTasks(); setShowForm(false); } catch (error: any) { showAlert("Error al guardar", error.message || "Fallo desconocido", "error"); }
   };
 
   const handleDeleteRequest = (id: number) => showConfirm("¿Eliminar?", "Irreversible.", async () => { await api.deleteTask(id); await loadTasks(); closeModals(); });
@@ -248,7 +253,6 @@ const OpoCalendarApp = () => {
         )}
       </main>
 
-      {/* --- MODALES --- */}
       {showAIModal && (
         <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm animate-in fade-in">
             <div className="bg-white w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden animate-in zoom-in-95 flex flex-col">

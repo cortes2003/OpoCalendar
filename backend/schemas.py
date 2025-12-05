@@ -2,6 +2,7 @@ from pydantic import BaseModel
 from typing import Optional
 import datetime
 from models import TaskType, Priority
+from pydantic import BaseModel, ConfigDict
 
 # Esquema base (datos comunes)
 class TaskBase(BaseModel):
@@ -46,9 +47,9 @@ class TaskUpdate(BaseModel):
 # Esquema para LEER
 class Task(TaskBase):
     id: int
-
-    class Config:
-        from_attributes = True
+    
+    # Sintaxis moderna V2
+    model_config = ConfigDict(from_attributes=True)
 
 
 # Esquema para un Descanso (Input del usuario)

@@ -13,6 +13,10 @@ models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="OpoFlow API")
 
+@app.get("/")
+def read_root():
+    return {"mensaje": "¡Hola desde el Backend de OpoFlow!", "estado": "Funcionando 🚀"}
+
 # CORS (Permitir que React hable con Python)
 app.add_middleware(
     CORSMiddleware,
