@@ -11,11 +11,11 @@ from typing import List
 # Crear tablas al inicio
 models.Base.metadata.create_all(bind=engine)
 
-app = FastAPI(title="OpoFlow API")
+app = FastAPI(title="OpoCalendar API")
 
 @app.get("/")
 def read_root():
-    return {"mensaje": "¡Hola desde el Backend de OpoFlow!", "estado": "Funcionando 🚀"}
+    return {"mensaje": "¡Hola desde el Backend de OpoCalendar!", "estado": "Funcionando 🚀"}
 
 # CORS (Permitir que React hable con Python)
 app.add_middleware(

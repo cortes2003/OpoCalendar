@@ -47,7 +47,7 @@ El proyecto sigue una arquitectura de **Monorepo** dividida en dos servicios:
     │   ├── venv/  # Entorno virtual (no se sube a git)
     │   ├── main.py
     │   └── ...
-    ├── opoflow/
+    ├── frontend/
     │   ├── src/
     │   └── ...
     └── README.md
@@ -98,7 +98,7 @@ El servidor estará escuchando en: http://127.0.0.1:8000
 Abre otra terminal nueva en la raíz del proyecto:
 
 ``` bash
-cd opoflow
+cd frontend
 
 # 1. Instalar dependencias (solo la primera vez)
 npm install

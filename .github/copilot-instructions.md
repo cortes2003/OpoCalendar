@@ -18,7 +18,7 @@ OpoCalendar is a full-stack study planner for competitive exam candidates ("opos
   - Returns proposals WITHOUT saving - requires separate `/optimize/apply` endpoint to commit changes
 - **Pydantic V2 Patterns**: Use modern syntax (`model_config = ConfigDict(from_attributes=True)`, `model_dump()` instead of `dict()`)
 
-### Frontend: `opoflow/src/` (React + TypeScript)
+### Frontend: `frontend/src/` (React + TypeScript)
 - **State Management**: Uses custom `useStickyState` hook (localStorage-backed) for user settings persistence across sessions.
 - **API Layer** (`api.ts`) - **ADAPTER PATTERN (CRITICAL)**:
   - Acts as translation layer between backend/frontend conventions
@@ -51,7 +51,7 @@ uvicorn main:app --reload --reload-exclude 'venv/*'
 
 **Frontend**:
 ```powershell
-cd opoflow
+cd frontend
 npm run dev
 # Server: http://localhost:5173
 ```
@@ -156,6 +156,6 @@ Use auto-generated Swagger UI at `http://127.0.0.1:8000/docs` - includes request
 
 ## Deployment Notes
 - Backend requires MySQL server - SQLite not supported (hard MySQL dependency in `database.py`)
-- Frontend build: `npm run build` → outputs to `opoflow/dist/`
+- Frontend build: `npm run build` → outputs to `frontend/dist/`
 - No environment variable system yet - all config hardcoded
 - Database credentials exposed in source - add `.env` before production deployment
