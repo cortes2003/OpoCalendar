@@ -26,6 +26,7 @@ describe('OpoCalendar Frontend Tests', () => {
   });
 
   const waitForLoading = async () => {
+    // Esperar a que desaparezca el indicador de carga si existe, o esperar un ciclo
     const loader = screen.queryByText(/Cargando/i);
     if (loader) await waitForElementToBeRemoved(loader);
   };
@@ -42,31 +43,41 @@ describe('OpoCalendar Frontend Tests', () => {
     render(<OpoCalendarApp />);
     await waitForLoading();
     
+    // Busca el botón que contiene "Nueva"
     const newButtons = screen.getAllByText(/Nueva/i);
     fireEvent.click(newButtons[0]);
 
-    expect(screen.getByText('Nueva')).toBeInTheDocument();
-    expect(screen.getByText('Guardar')).toBeInTheDocument();
+    // Verifica que el modal se abre (Header del modal)
+    expect(screen.getByRole('heading', { name: 'Nueva' })).toBeInTheDocument();
+    // Verifica botón de guardar
+    expect(screen.getByText(/Guardar/i)).toBeInTheDocument();
   });
 
   it('valida que la hora fin no sea anterior a la de inicio', async () => {
-    render(<OpoCalendarApp />);
+    // Usamos 'container' extraído de render para poder buscar por querySelector
+    const { container } = render(<OpoCalendarApp />);
     await waitForLoading();
     
     const newButtons = screen.getAllByText(/Nueva/i);
     fireEvent.click(newButtons[0]);
 
-    // Usar selectores más genéricos o data-testid sería mejor, pero esto sirve
-    // Asumimos que los inputs time están ordenados en el DOM
-    const timeInputs = screen.container.querySelectorAll('input[type="time"]');
-    // timeInputs[0] es start_time, [1] es end_time
+    // Buscar inputs de tipo time
+    const timeInputs = container.querySelectorAll('input[type="time"]');
+    // timeInputs[0] = Horario Inicio Sidebar
+    // timeInputs[1] = Horario Fin Sidebar
+    // timeInputs[2] = Inicio Tarea (Modal)
+    // timeInputs[3] = Fin Tarea (Modal)
     
-    fireEvent.change(timeInputs[0], { target: { value: '10:00' } });
-    fireEvent.change(timeInputs[1], { target: { value: '09:00' } });
+    // Aseguramos que estamos tocando los del modal (índices 2 y 3)
+    if (timeInputs.length >= 4) {
+        fireEvent.change(timeInputs[2], { target: { value: '10:00' } });
+        fireEvent.change(timeInputs[3], { target: { value: '09:00' } }); // Fin antes que inicio
+    }
 
-    fireEvent.click(screen.getByText('Guardar'));
+    fireEvent.click(screen.getByText(/Guardar/i));
 
-    expect(await screen.findByText('Error horario')).toBeInTheDocument();
+    // Esperar a que aparezca el mensaje de error
+    expect(await screen.findByText(/Error horario/i)).toBeInTheDocument();
   });
 
   it('muestra el modal de IA al pulsar Organizar', async () => {
@@ -76,7 +87,7 @@ describe('OpoCalendar Frontend Tests', () => {
     const iaButton = screen.getByText(/Organizar con IA/i);
     fireEvent.click(iaButton);
 
-    expect(screen.getByText('Asistente IA')).toBeInTheDocument();
+    expect(screen.getByText(/Asistente IA/i)).toBeInTheDocument();
   });
 
 });

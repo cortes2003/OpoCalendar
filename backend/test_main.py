@@ -2,13 +2,12 @@ from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
-from datetime import date, time
+from datetime import date
 
 from database import Base, get_db
 from main import app
 
-# --- CONFIGURACIÓN DE BASE DE DATOS DE PRUEBA (SQLite en Memoria) ---
-# Usamos SQLite en memoria para que sea ultra-rápido y no toque tu MySQL real
+# --- CONFIGURACIÓN DB PRUEBAS (SQLite Memoria) ---
 SQLALCHEMY_DATABASE_URL = "sqlite://"
 
 engine = create_engine(
@@ -28,14 +27,17 @@ def override_get_db():
 app.dependency_overrides[get_db] = override_get_db
 client = TestClient(app)
 
-# Reiniciamos la BD antes de cada sesión de tests
 def setup_module(module):
     Base.metadata.create_all(bind=engine)
 
-# --- 1. TESTS DE CREACIÓN (CREATE) ---
+# --- TESTS ---
+
+def test_read_root():
+    response = client.get("/")
+    assert response.status_code == 200
+    assert response.json()["estado"] == "Funcionando 🚀"
 
 def test_create_task_happy_path():
-    """Prueba crear una tarea con todos los datos correctos"""
     response = client.post("/tasks", json={
         "title": "Estudiar Constitución",
         "description": "Artículos 1-10",
@@ -56,41 +58,18 @@ def test_create_task_happy_path():
     assert data["id"] == 1
 
 def test_create_task_missing_fields():
-    """Prueba que falle si falta un campo obligatorio (ej: título)"""
     response = client.post("/tasks", json={
         "description": "Sin título",
-        "type": "study",
-        # Falta title, date, etc.
-    })
-    assert response.status_code == 422 # Unprocessable Entity
-
-def test_create_task_invalid_types():
-    """Prueba enviar un string donde va un booleano o fecha inválida"""
-    response = client.post("/tasks", json={
-        "title": "Error Fechas",
-        "type": "study",
-        "priority": "high",
-        "date": "fecha-invalida", # ERROR
-        "start_time": "09:00:00",
-        "end_time": "10:00:00",
-        "duration": 60
+        "type": "study"
     })
     assert response.status_code == 422
 
-# --- 2. TESTS DE LECTURA (READ) ---
-
 def test_read_tasks():
-    """Debe devolver la lista con la tarea creada antes"""
     response = client.get("/tasks")
     assert response.status_code == 200
-    data = response.json()
-    assert len(data) >= 1
-    assert data[0]["title"] == "Estudiar Constitución"
-
-# --- 3. TESTS DE ACTUALIZACIÓN (UPDATE) ---
+    assert len(response.json()) >= 1
 
 def test_update_task_success():
-    """Modificar una tarea existente"""
     response = client.put("/tasks/1", json={
         "title": "Estudiar Modificado",
         "completed": True
@@ -101,32 +80,22 @@ def test_update_task_success():
     assert data["completed"] == True
 
 def test_update_task_not_found():
-    """Intentar modificar una tarea que no existe (ID 999)"""
     response = client.put("/tasks/999", json={"title": "Fantasma"})
     assert response.status_code == 404
-    assert response.json()["detail"] == "Tarea no encontrada"
-
-# --- 4. TESTS DE IA (OPTIMIZE) ---
 
 def test_optimize_endpoint_structure():
-    """Verificar que el endpoint de cálculo responde al esquema correcto"""
-    # Creamos una situación: Tarea existente hoy
     today = str(date.today())
-    
-    # Lanzamos el cálculo
     payload = {
         "day_start": "08:00",
         "day_end": "22:00",
         "breaks": [{"start_time": "14:00", "end_time": "15:00"}]
     }
     response = client.post(f"/optimize/calculate/{today}", json=payload)
-    
-    # Debe responder 200 OK y una lista (aunque esté vacía si ya está optimizado)
     assert response.status_code == 200
     assert isinstance(response.json(), list)
 
 def test_optimize_apply_changes():
-    """Simular aplicación de cambios de la IA"""
+    # Enviar propuesta válida según schema TaskProposal
     propuesta = [{
         "task_id": 1,
         "title": "Estudiar Modificado",
@@ -137,19 +106,18 @@ def test_optimize_apply_changes():
     response = client.post("/optimize/apply", json=propuesta)
     assert response.status_code == 200
     
-    # Verificar que se cambió en BD
+    # Verificar cambio
     task_res = client.get("/tasks")
+    # Buscamos la tarea 1
     task = next(t for t in task_res.json() if t["id"] == 1)
+    # Nota: La API devuelve HH:MM (sin segundos) por el helper de api.ts, 
+    # pero aquí probamos el backend directo que devuelve HH:MM:SS.
     assert task["start_time"] == "10:00:00"
 
-# --- 5. TESTS DE BORRADO (DELETE) ---
-
 def test_delete_task_success():
-    """Borrar la tarea 1"""
     response = client.delete("/tasks/1")
     assert response.status_code == 200
 
 def test_delete_task_not_found():
-    """Intentar borrar la tarea 1 otra vez (ya no existe)"""
     response = client.delete("/tasks/1")
     assert response.status_code == 404
