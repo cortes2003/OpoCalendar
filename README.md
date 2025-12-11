@@ -87,7 +87,7 @@ pip install -r requirements.txt
 # Abre backend/database.py y edita la variable SQLALCHEMY_DATABASE_URL con tu contraseña de MySQL.
 
 # 5. Iniciar servidor
-uvicorn main:app --reload --reload-exclude 'venv/*'
+uvicorn main:app --reload --reload-exclude='venv/*'
 ```
 
 El servidor estará escuchando en: http://127.0.0.1:8000
