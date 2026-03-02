@@ -2,6 +2,7 @@ from fastapi import FastAPI, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from typing import List
+import os
 
 import models, schemas, crud, ai_service
 from database import engine, get_db
@@ -18,9 +19,12 @@ def read_root():
     return {"mensaje": "¡Hola desde el Backend de OpoCalendar!", "estado": "Funcionando 🚀"}
 
 # CORS (Permitir que React hable con Python)
+# Soporta múltiples orígenes separados por coma para entornos de desarrollo y producción
+allowed_origins = os.getenv("FRONTEND_URL", "http://localhost:5173").split(",")
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

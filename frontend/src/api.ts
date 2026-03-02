@@ -1,6 +1,6 @@
 import type { Task } from './types';
 
-const API_URL = 'http://localhost:8000';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
 const formatTimeForInput = (timeStr: string) => timeStr.slice(0, 5);
 const formatTimeForDb = (timeStr: string) => timeStr.length === 5 ? `${timeStr}:00` : timeStr;
