@@ -8,9 +8,22 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "test": "vitest"
+    "test": "vitest",
+    "cap:add:android": "cap add android",
+    "cap:build:android": "cap build android",
+    "cap:run:android": "cap run android",
+    "cap:open:android": "cap open android",
+    "cap:sync": "cap sync"
   },
   "dependencies": {
+    "@capacitor/android": "^5.0.0",
+    "@capacitor/app": "^5.0.2",
+    "@capacitor/core": "^5.0.0",
+    "@capacitor/keyboard": "^5.0.2",
+    "@capacitor/preferences": "^5.0.2",
+    "@capacitor/statusbar": "^5.0.2",
+    "@capacitor-community/http": "^5.0.0",
+    "@capacitor-community/native-audio": "^6.1.0",
     "@tailwindcss/postcss": "^4.1.17",
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
@@ -20,6 +33,7 @@
     "tailwind-merge": "^3.4.0"
   },
   "devDependencies": {
+    "@capacitor/cli": "^5.0.0",
     "@eslint/js": "^9.39.1",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.0",

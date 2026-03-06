@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<network-security-config>
+    <!-- ✅ LOCALHOST para desarrollo -->
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="true">localhost</domain>
+        <domain includeSubdomains="true">127.0.0.1</domain>
+        <domain includeSubdomains="true">10.0.2.2</domain>
+    </domain-config>
+
+    <!-- ✅ PRODUCCIÓN: Solo HTTPS -->
+    <domain-config>
+        <domain includeSubdomains="true">api.opocalendar.com</domain>
+        <pin-set expiration="2026-12-31">
+            <!-- Reemplaza con tu certificado de producción -->
+            <pin digest="SHA-256">AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</pin>
+        </pin-set>
+    </domain-config>
+
+    <!-- ✅ CERTIFICADOS DEL SISTEMA -->
+    <trust-anchors>
+        <certificates src="system" />
+        <certificates src="user" />
+    </trust-anchors>
+
+    <!-- ✅ PROTECCIÓN CONTRA SNIFFING -->
+    <config cleartextTrafficPermitted="false" />
+</network-security-config>

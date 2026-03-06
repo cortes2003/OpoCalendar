@@ -2,9 +2,10 @@
 
 **OpoCalendar** es una aplicación Full Stack diseñada para optimizar el tiempo de estudio de opositores y estudiantes. Utiliza un motor de Inteligencia Artificial (Python) para reorganizar automáticamente la agenda diaria, rellenando huecos libres con tareas de estudio mientras respeta horarios fijos (clases, comidas) y descansos.
 
-![Estado](https://img.shields.io/badge/Estado-Beta_Funcional-blue)
+![Estado](https://img.shields.io/badge/Estado-v2.0_Segura-green)
 ![Licencia](https://img.shields.io/badge/Licencia-MIT-green)
-![Stack](https://img.shields.io/badge/Stack-MERN_Hybrid-orange)
+![Stack](https://img.shields.io/badge/Stack-Python_React_Android-orange)
+![Seguridad](https://img.shields.io/badge/Seguridad-JWT_HTTPS_Android-red)
 
 ------------------------------------------------------------------------
 
@@ -16,6 +17,53 @@
 * **⚡ Persistencia Real:** Base de datos MySQL conectada mediante API REST (FastAPI).
 * **🔔 Sistema de Notificaciones:** Alertas en el navegador y simulador de envío de correos.
 * **⚙️ Configuración Personalizada:** Define tu horario de sueño/actividad y preferencias personales.
+* **🔐 Seguridad Enterprise:** JWT, HTTPS, Rate Limiting, XSS Protection, CORS Restrictivo.
+* **📱 Soporte Android:** App nativa con Capacitor, lista para Play Store.
+
+------------------------------------------------------------------------
+
+## 🔐 Seguridad (v2.0 - Actualización)
+
+La aplicación ahora cumple con estándares de seguridad internacionales:
+
+- ✅ **Autenticación JWT** con tokens de acceso (30min) y refresco (7 días)
+- ✅ **Encriptación** de datos sensibles en tránsito y en reposo
+- ✅ **Rate Limiting** por endpoint (5-30 intentos/minuto)
+- ✅ **CORS Restrictivo** - solo orígenes autorizados
+- ✅ **Validación y Sanitización** contra SQL Injection y XSS
+- ✅ **Headers de Seguridad** (HSTS, CSP, X-Frame-Options, etc.)
+- ✅ **Almacenamiento Seguro** de tokens en el cliente
+- ✅ **Network Security** en Android (Certificate Pinning, cleartext disabled)
+- ✅ **Ofuscación de Código** en APK de producción
+
+📖 Ver [SECURITY.md](SECURITY.md) para detalles completos.
+
+------------------------------------------------------------------------
+
+## 📱 Android (NEW!)
+
+OpoCalendar ahora es nativa en Android usando Capacitor:
+
+- 📦 **APK de Producción** con ofuscación ProGuard
+- 🔒 **Almacenamiento Seguro** de tokens con EncryptedSharedPreferences
+- 🌐 **Network Security** restrictivo (HTTPS only en producción)
+- 📋 **Permisos Minimales** (solo los necesarios)
+- 🚀 **Lista para Play Store**
+
+### Quick Start Android
+```bash
+cd frontend
+npm run build
+npm run cap:add:android    # Primera vez
+npm run cap:run:android    # En emulador
+npm run cap:build:android  # Build APK
+```
+
+O usar el script de setup:
+```bash
+./setup-android.sh         # Linux/macOS
+.\\setup-android.bat       # Windows
+```
 
 ------------------------------------------------------------------------
 
@@ -28,6 +76,7 @@ El proyecto sigue una arquitectura de **Monorepo** dividida en dos servicios:
 * **Build Tool:** Vite
 * **Estilos:** Tailwind CSS v4
 * **UI Components:** Lucide React (Iconos)
+* **Mobile:** Capacitor para iOS/Android
 * **Gestión de Fechas:** Date-fns
 
 ### 🧠 Backend (El Cerebro)

@@ -1,0 +1,101 @@
+apply plugin: 'com.android.application'
+
+android {
+    namespace = "com.opocalendar.app"
+    compileSdkVersion rootProject.ext.compileSdkVersion
+
+    defaultConfig {
+        applicationId = "com.opocalendar.app"
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
+        versionCode = 1
+        versionName = "2.0.0"
+
+        // ✅ Vector Drawables
+        vectorDrawables.useSupportLibrary = true
+
+        // ✅ Habilitar multidex si es necesario
+        multiDexEnabled = true
+
+        // ✅ Configuración de compilación segura
+        manifestPlaceholders = [
+            'appAuthRedirectScheme': 'com.opocalendar.app'
+        ]
+    }
+
+    buildTypes {
+        release {
+            // ✅ Habilitar ProGuard/R8 para ofuscar código
+            minifyEnabled = true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+
+            // ✅ Proteger contra debugging
+            debuggable = false
+
+            // ✅ Habilitar optimizaciones
+            ndk {
+                debugSymbolLevel 'full'
+            }
+
+            signingConfig signingConfigs.release
+        }
+
+        debug {
+            // ✅ Permitir debugging en desarrollo
+            debuggable = true
+            minifyEnabled = false
+        }
+    }
+
+    // ✅ Configuración de firma (reemplaza con tus valores)
+    signingConfigs {
+        release {
+            keyAlias = System.getenv('KEY_ALIAS') ?: 'androiddebugkey'
+            keyPassword = System.getenv('KEY_PASSWORD') ?: 'android'
+            storeFile = file(System.getenv('KEYSTORE_FILE') ?: 'keystore.jks')
+            storePassword = System.getenv('STORE_PASSWORD') ?: 'android'
+        }
+    }
+
+    // ✅ Lint options para seguridad
+    lintOptions {
+        disable 'MissingTranslation'
+        abortOnError = false
+        checkReleaseBuilds = true
+        warningsAsErrors = false
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
+    }
+}
+
+repositories {
+    google()
+    mavenCentral()
+}
+
+dependencies {
+    implementation fileTree(includeBuiltModules: true, dir: 'libs')
+
+    // ✅ Capacitor
+    implementation 'com.getcapacitor:core:5.0.0'
+    implementation 'com.getcapacitor:android:5.0.0'
+
+    // ✅ AndroidX
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'androidx.coordinatorlayout:coordinatorlayout:1.2.0'
+    implementation 'androidx.core:core:1.10.1'
+
+    // ✅ Plugins de Capacitor
+    implementation 'com.getcapacitor.community:preferences:5.1.0'
+    implementation 'com.getcapacitor.community:http:5.0.0'
+
+    // ✅ Security
+    implementation 'androidx.security:security-crypto:1.1.0-alpha06'
+
+    // ✅ Testing
+    testImplementation 'junit:junit:4.13.2'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
+}

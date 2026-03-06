@@ -1,6 +1,8 @@
-from sqlalchemy import Column, Integer, String, Boolean, Date, Time, Enum
+from sqlalchemy import Column, Integer, String, Boolean, Date, Time, Enum, DateTime, ForeignKey
+from sqlalchemy.orm import relationship
 from database import Base
 import enum
+from datetime import datetime
 
 # Opciones fijas (Enums)
 class TaskType(str, enum.Enum):
@@ -14,11 +16,26 @@ class Priority(str, enum.Enum):
     medium = "medium"
     low = "low"
 
+# 🔐 Tabla de Usuarios (Autenticación)
+class User(Base):
+    __tablename__ = "users"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    username = Column(String(50), unique=True, nullable=False, index=True)
+    email = Column(String(255), unique=True, nullable=False, index=True)
+    hashed_password = Column(String(255), nullable=False)
+    is_active = Column(Boolean, default=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    
+    # Relación con tareas
+    tasks = relationship("Task", back_populates="user")
+
 # Tabla de Tareas
 class Task(Base):
     __tablename__ = "tasks"
 
     id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     title = Column(String(255), nullable=False)
     description = Column(String(500), nullable=True)
     
@@ -37,3 +54,6 @@ class Task(Base):
     email_reminder = Column(Boolean, default=True)
     repeat_weekly = Column(Boolean, default=False)
     completed = Column(Boolean, default=False)
+    
+    # Relación con usuario
+    user = relationship("User", back_populates="tasks")

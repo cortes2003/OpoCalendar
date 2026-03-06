@@ -1,0 +1,77 @@
+<?xml version='1.0' encoding='utf-8'?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.opocalendar.app">
+
+    <!-- ✅ PERMISOS OBLIGATORIOS -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+    <!-- ✅ PERMISOS PARA NOTIFICACIONES -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+
+    <!-- ✅ PERMISOS PARA ALMACENAMIENTO (si es necesario) -->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
+    <!-- ✅ PERMISOS PARA VIBRACIÓN -->
+    <uses-permission android:name="android.permission.VIBRATE" />
+
+    <!-- ✅ PERMISOS DE CALENDARIO (opcional) -->
+    <uses-permission android:name="android.permission.READ_CALENDAR" />
+    <uses-permission android:name="android.permission.WRITE_CALENDAR" />
+
+    <application
+        android:allowBackup="false"
+        android:debuggable="false"
+        android:hardwareAccelerated="true"
+        android:icon="@drawable/ic_launcher"
+        android:label="@string/app_name"
+        android:networkSecurityConfig="@xml/network_security_config"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme"
+        android:usesCleartextTraffic="false">
+
+        <!-- ✅ CONFIGURACIÓN DE SEGURIDAD -->
+        <activity
+            android:name="com.getcapacitor.MainActivity"
+            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale|smallestScreenSize|screenLayout|uiMode"
+            android:exported="true"
+            android:label="@string/title_activity_main"
+            android:launchMode="singleTask"
+            android:theme="@style/AppTheme">
+
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+
+            <!-- ✅ ESQUEMA PERSONALIZADO PARA DEEP LINKING -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="opocalendar" android:host="app" />
+            </intent-filter>
+        </activity>
+
+        <!-- ✅ RECEPTOR DE NOTIFICACIONES -->
+        <receiver
+            android:name="com.getcapacitor.plugins.notification.NotificationReceiver"
+            android:exported="true" />
+
+        <!-- ✅ PROVEEDOR DE USUARIOS -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="com.opocalendar.app.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
+
+    </application>
+
+</manifest>
